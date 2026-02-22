@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>YRYGO | Aftab Ghori Mega Mall</title>
+    <style>
+        :root { --blue: #2874f0; --yellow: #ffe500; --orange: #fb641b; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background: #f1f3f6; }
+        header { background: var(--blue); padding: 15px; position: sticky; top: 0; z-index: 1000; color: white; text-align: center; }
+        .logo { font-size: 22px; font-weight: 900; font-style: italic; }
+        .logo span { color: var(--yellow); font-size: 10px; display: block; }
+        
+        #grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px; }
+        .card { background: white; padding: 10px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .img-box { height: 150px; background: #eee; border-radius: 5px; overflow: hidden; margin-bottom: 8px; }
+        .img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .price { font-size: 18px; font-weight: bold; color: #388e3c; }
+
+        /* Full Screen Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 2000; overflow-y: auto; }
+        .m-head { background: var(--blue); color: white; padding: 15px; font-size: 18px; display: flex; gap: 15px; align-items: center; position: sticky; top: 0; }
+        .m-body { padding: 15px; padding-bottom: 120px; }
+        
+        .order-form { background: #f9f9f9; padding: 15px; border-radius: 10px; border: 1px solid #ddd; margin-top: 15px; text-align: left; }
+        .order-form input, .order-form textarea { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
+        
+        /* FIXED SUBMIT BUTTON - YE HAMESHA DIKHEGA */
+        .submit-btn { 
+            position: fixed; bottom: 10px; left: 5%; width: 90%;
+            background: var(--orange); color: white; border: none; padding: 18px; 
+            font-size: 20px; font-weight: bold; border-radius: 10px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 3000;
+        }
+
+        .footer { background: #1a1a1a; color: white; text-align: center; padding: 40px; margin-top: 20px; }
+        .footer h2 { color: var(--yellow); font-size: 28px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">YRYGO <span>Mega Mall by Aftab Ghori</span></div>
+</header>
+
+<div id="grid"></div>
+
+<footer class="footer">
+    <p>DEVELOPED BY</p>
+    <h2>AFTAB GHORI</h2>
+    <p>WhatsApp: 7728979968</p>
+</footer>
+
+<div id="modal" class="modal">
+    <div class="m-head"><span onclick="closeM()" style="cursor:pointer; font-size:30px;">←</span> Details</div>
+    <div class="m-body">
+        <img id="mImg" style="width: 100%; height: 250px; object-fit: cover; border-radius: 10px;">
+        <h2 id="mTitle" style="margin: 10px 0;"></h2>
+        <div id="mPrice" class="price" style="font-size: 24px;"></div>
+        
+        <div class="order-form">
+            <h3 style="margin-bottom:10px;">Delivery Address</h3>
+            <input type="text" id="uName" placeholder="Aapka Naam">
+            <input type="number" id="uPhone" placeholder="WhatsApp No">
+            <textarea id="uAddr" rows="3" placeholder="Pura Pata (Area, Pin Code)"></textarea>
+        </div>
+    </div>
+    <button class="submit-btn" onclick="send()">SUBMIT ORDER (WhatsApp)</button>
+</div>
+
+<script>
+    let products = [];
+    const images = [
+        "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400", // Cosmetic
+        "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=400", // Suit
+        "https://images.unsplash.com/photo-1594932224828-b4b059b6f684?w=400", // Gents
+        "https://images.unsplash.com/photo-1584285418504-0051b6d49f39?w=400"  // Sui Dhaga
+    ];
+
+    function build() {
+        for (let i = 1; i <= 500; i++) {
+            products.push({
+                id: i,
+                name: "Premium Item #" + i,
+                price: 99 + (i % 500),
+                img: images[i % images.length]
+            });
+        }
+    }
+
+    function render() {
+        document.getElementById('grid').innerHTML = products.map(p => `
+            <div class="card" onclick="openM(${p.id})">
+                <div class="img-box"><img src="${p.img}"></div>
+                <h3>${p.name}</h3>
+                <div class="price">₹${p.price}</div>
+            </div>
+        `).join('');
+    }
+
+    let active = null;
+    function openM(id) {
+        active = products.find(p => p.id === id);
+        document.getElementById('mImg').src = active.img;
+        document.getElementById('mTitle').innerText = active.name;
+        document.getElementById('mPrice').innerText = "₹" + active.price;
+        document.getElementById('modal').style.display = "block";
+    }
+
+    function closeM() { document.getElementById('modal').style.display = "none"; }
+
+    function send() {
+        let n = document.getElementById('uName').value;
+        let p = document.getElementById('uPhone').value;
+        let a = document.getElementById('uAddr').value;
+        if(!n || !p || !a) return alert("Bhai, Details bharna zaroori hai!");
+        window.location.href = `https://wa.me/917728979968?text=*ORDER FROM YRYGO*%0A*By Aftab Ghori Mall*%0A%0A*Item:* ${active.name}%0A*Price:* ₹${active.price}%0A*Name:* ${n}%0A*Address:* ${a}`;
+    }
+    build(); render();
+</script>
+</body>
+</html>
